@@ -3,105 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Weather App</title>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="css/style.css?v=11">
 </head>
+
 <body>
+
     <div class="app-container">
+
+        <!-- =========================
+             Header
+        ========================== -->
         <header class="app-header">
+
             <div>
-                <p class="eyebrow">Atmospheric brief · حالة الجو</p>
-                <h1>Weather Forecast</h1>
+                <p class="eyebrow">
+                    Atmospheric brief · حالة الجو
+                </p>
+
+                <h1>
+                    Weather Forecast
+                </h1>
             </div>
-            <div class="unit-toggle" role="group" aria-label="Temperature unit">
-                <button id="celsius" class="active" type="button" aria-label="Celsius" aria-pressed="true">°C</button>
-                <button id="fahrenheit" type="button" aria-label="Fahrenheit" aria-pressed="false">°F</button>
+
+            <!-- Temperature Unit Toggle -->
+            <div
+                class="unit-toggle"
+                role="group"
+                aria-label="Temperature unit"
+            >
+
+                <button
+                    id="celsius"
+                    class="active"
+                    type="button"
+                    aria-label="Celsius"
+                    aria-pressed="true"
+                >
+                    °C
+                </button>
+
+                <button
+                    id="fahrenheit"
+                    type="button"
+                    aria-label="Fahrenheit"
+                    aria-pressed="false"
+                >
+                    °F
+                </button>
+
             </div>
+
         </header>
 
+
+        <!-- =========================
+             Main Content
+        ========================== -->
         <main class="app-main">
+
+            <!-- =========================
+                 Search Section
+            ========================== -->
             <div class="search-container">
-                <form id="search-form" class="search-box">
-                    <label class="sr-only" for="city-input">Search for a city</label>
-                    <input type="text" id="city-input" dir="auto" placeholder="Search a city... / ابحث عن مدينة..." autocomplete="off" spellcheck="false">
-                    <button id="search-btn" type="submit" aria-label="Search city">Search / بحث</button>
+
+                <form
+                    id="search-form"
+                    class="search-box"
+                >
+
+                    <label
+                        class="sr-only"
+                        for="city-input"
+                    >
+                        Search for a city
+                    </label>
+
+                    <input
+                        type="text"
+                        id="city-input"
+                        dir="auto"
+                        placeholder="Search a city... / ابحث عن مدينة..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                    <button
+                        id="search-btn"
+                        type="submit"
+                        aria-label="Search city"
+                    >
+                        Search / بحث
+                    </button>
+
                 </form>
-                <button id="geo-btn" type="button" aria-label="Use my location">
+
+
+                <!-- Geolocation Button -->
+                <button
+                    id="geo-btn"
+                    type="button"
+                    aria-label="Use my location"
+                >
                     Use my location / موقعي
                 </button>
+
             </div>
 
-            <div id="loading" class="loading hidden">
+
+            <!-- =========================
+                 Loading State
+            ========================== -->
+            <div
+                id="loading"
+                class="loading hidden"
+            >
+
                 <div class="spinner"></div>
-                <p>Loading weather data... جاري تحميل الطقس</p>
+
+                <p>
+                    Loading weather data...
+                    جاري تحميل الطقس
+                </p>
+
             </div>
 
-            <div id="error" class="error-message hidden" role="alert"></div>
-            <p id="status" class="sr-only" aria-live="polite"></p>
 
-            <div id="current-weather" class="weather-card hidden">
+            <!-- =========================
+                 Error Message
+            ========================== -->
+            <div
+                id="error"
+                class="error-message hidden"
+                role="alert"
+            ></div>
+
+
+            <!-- Accessible Status -->
+            <p
+                id="status"
+                class="sr-only"
+                aria-live="polite"
+            ></p>
+
+
+            <!-- =========================
+                 Current Weather
+            ========================== -->
+            <div
+                id="current-weather"
+                class="weather-card hidden"
+            >
+
+                <!-- Current Weather Header -->
                 <div class="current-header">
-                    <h2 id="city-name">Loading...</h2>
-                    <p id="last-updated">Just now</p>
+
+                    <h2 id="city-name">
+                        Loading...
+                    </h2>
+
+                    <p id="last-updated">
+                        Just now
+                    </p>
+
                 </div>
+
+
+                <!-- Current Weather Main -->
                 <div class="current-main">
+
+                    <!-- Temperature -->
                     <div class="temp-container">
-                        <img id="current-icon" src="" alt="Weather icon" class="weather-icon">
+
+                        <img
+                            id="current-icon"
+                            src=""
+                            alt="Weather icon"
+                            class="weather-icon"
+                        >
+
                         <div class="temp-info">
-                            <span id="current-temp">--</span>
+
+                            <span id="current-temp">
+                                --
+                            </span>
+
                             <div class="temp-details">
-                                <span id="feels-like">Feels like: --</span>
-                                <span id="temp-range">H:-- L:--</span>
+
+                                <span id="feels-like">
+                                    Feels like: --
+                                </span>
+
+                                <span id="temp-range">
+                                    H:-- L:--
+                                </span>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
+                    <!-- Weather Details -->
                     <div class="weather-details">
-                        <p id="weather-desc">--</p>
+
+                        <p id="weather-desc">
+                            --
+                        </p>
+
+
+                        <!-- Details Grid -->
                         <div class="details-grid">
+
+                            <!-- Humidity -->
                             <div class="detail-item">
-                                <strong>Humidity / الرطوبة</strong>
-                                <span id="humidity">Humidity: --%</span>
+
+                                <strong>
+                                    Humidity / الرطوبة
+                                </strong>
+
+                                <span id="humidity">
+                                    Humidity: --%
+                                </span>
+
                             </div>
+
+
+                            <!-- Wind -->
                             <div class="detail-item">
-                                <strong>Wind / الرياح</strong>
-                                <span id="wind">Wind: -- km/h</span>
+
+                                <strong>
+                                    Wind / الرياح
+                                </strong>
+
+                                <span id="wind">
+                                    Wind: -- km/h
+                                </span>
+
                             </div>
+
+
+                            <!-- Pressure -->
                             <div class="detail-item">
-                                <strong>Pressure / الضغط</strong>
-                                <span id="pressure">Pressure: -- hPa</span>
+
+                                <strong>
+                                    Pressure / الضغط
+                                </strong>
+
+                                <span id="pressure">
+                                    Pressure: -- hPa
+                                </span>
+
                             </div>
+
+
+                            <!-- Sunrise -->
                             <div class="detail-item">
-                                <strong>Sunrise / الشروق</strong>
-                                <span id="sunrise">Sunrise: --</span>
+
+                                <strong>
+                                    Sunrise / الشروق
+                                </strong>
+
+                                <span id="sunrise">
+                                    Sunrise: --
+                                </span>
+
                             </div>
+
+
+                            <!-- Sunset -->
                             <div class="detail-item">
-                                <strong>Sunset / الغروب</strong>
-                                <span id="sunset">Sunset: --</span>
+
+                                <strong>
+                                    Sunset / الغروب
+                                </strong>
+
+                                <span id="sunset">
+                                    Sunset: --
+                                </span>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <div id="forecast" class="forecast-container hidden">
-                <h3>5-Day Forecast / توقعات 5 أيام</h3>
+
+            <!-- =========================
+                 5-Day Forecast
+            ========================== -->
+            <div
+                id="forecast"
+                class="forecast-container hidden"
+            >
+
+                <h3>
+                    5-Day Forecast / توقعات 5 أيام
+                </h3>
+
+
                 <div class="forecast-slider">
-                    <div class="forecast-cards" id="forecast-cards">
-                        <!-- Forecast cards will be inserted here -->
+
+                    <div
+                        class="forecast-cards"
+                        id="forecast-cards"
+                    >
+                        <!-- Forecast cards will be inserted by JavaScript -->
                     </div>
+
                 </div>
+
             </div>
+
         </main>
+
     </div>
 
-    <script src="js/config.js?v=3"></script>
-    <script src="js/utils.js?v=3"></script>
-    <script src="js/api.js?v=4"></script>
-    <script src="js/storage.js?v=3"></script>
-    <script src="js/ui.js?v=3"></script>
-    <script src="js/main.js?v=4"></script>
+
+    <!-- =========================
+         JavaScript Files
+    ========================== -->
+
+    <!-- Utilities -->
+    <script src="js/utils.js?v=4"></script>
+
+    <!-- Open-Meteo API -->
+    <script src="js/api.js?v=5"></script>
+
+    <!-- Local Storage -->
+    <script src="js/storage.js?v=4"></script>
+
+    <!-- UI -->
+    <script src="js/ui.js?v=4"></script>
+
+    <!-- Main Application -->
+    <script src="js/main.js?v=5"></script>
+
 </body>
 </html>
