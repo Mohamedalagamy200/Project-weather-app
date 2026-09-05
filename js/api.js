@@ -3,6 +3,14 @@
 // Open-Meteo API
 // ======================================================
 
+// Open-Meteo API endpoints
+const WEATHER_API_URL =
+    'https://api.open-meteo.com/v1/forecast';
+
+const GEOCODING_API_URL =
+    'https://geocoding-api.open-meteo.com/v1/search';
+
+
 // ======================================================
 // API Error Messages
 // ======================================================
@@ -32,7 +40,7 @@ async function requestJson(url, fallbackMessage = 'Something went wrong.') {
                 const details = await response.json();
                 serverMessage = details.reason || details.message || '';
             } catch (error) {
-                // Ignore JSON parsing errors
+                // Ignore JSON parsing errors.
             }
 
             throw new Error(
@@ -46,7 +54,7 @@ async function requestJson(url, fallbackMessage = 'Something went wrong.') {
 
     } catch (error) {
 
-        // Fetch/network failure
+        // Network / fetch failure
         if (error instanceof TypeError) {
             throw new Error('Network error, try again');
         }
@@ -69,30 +77,46 @@ async function getCityCoordinates(cityName) {
         throw new Error('Please enter a city name.');
     }
 
-    const language = /[\u0600-\u06FF]/.test(query) ? 'ar' : 'en';
+    // Automatically use Arabic search when Arabic characters are entered.
+    const language =
+        /[\u0600-\u06FF]/.test(query)
+            ? 'ar'
+            : 'en';
+
+    const params = new URLSearchParams({
+        name: query,
+        count: '1',
+        language: language,
+        format: 'json'
+    });
+
     const url =
-        `${GEOCODING_API_URL}?` +
-        `name=${encodeURIComponent(query)}` +
-        `&count=1` +
-        `&language=${language}` +
-        `&format=json`;
+        `${GEOCODING_API_URL}?${params.toString()}`;
 
     const data = await requestJson(
         url,
         'City not found'
     );
 
-    if (!data.results || !data.results.length) {
+    if (
+        !data ||
+        !Array.isArray(data.results) ||
+        data.results.length === 0
+    ) {
         throw new Error('City not found');
     }
 
     const city = data.results[0];
-    if (!Number.isFinite(city.latitude) || !Number.isFinite(city.longitude)) {
+
+    if (
+        !Number.isFinite(city.latitude) ||
+        !Number.isFinite(city.longitude)
+    ) {
         throw new Error('City coordinates are unavailable.');
     }
 
     return {
-        name: city.name,
+        name: city.name || query,
         country: city.country || '',
         countryCode: city.country_code || '',
         latitude: city.latitude,
@@ -119,9 +143,8 @@ function buildWeatherUrl(lat, lon, units = 'metric') {
             : 'kmh';
 
     const params = new URLSearchParams({
-
-        latitude: lat,
-        longitude: lon,
+        latitude: String(lat),
+        longitude: String(lon),
 
         current: [
             'temperature_2m',
@@ -147,7 +170,7 @@ function buildWeatherUrl(lat, lon, units = 'metric') {
 
         timezone: 'auto',
 
-        forecast_days: 5
+        forecast_days: '5'
     });
 
     return `${WEATHER_API_URL}?${params.toString()}`;
@@ -158,25 +181,37 @@ function buildWeatherUrl(lat, lon, units = 'metric') {
 // Get Weather By Coordinates
 // ======================================================
 
-async function getWeatherByCoords(lat, lon, units = 'metric') {
+async function getWeatherByCoords(
+    lat,
+    lon,
+    units = 'metric'
+) {
 
     if (
         typeof lat !== 'number' ||
         typeof lon !== 'number' ||
-        Number.isNaN(lat) ||
-        Number.isNaN(lon)
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon)
     ) {
         throw new Error('Invalid location coordinates.');
     }
 
-    const url = buildWeatherUrl(lat, lon, units);
+    const url = buildWeatherUrl(
+        lat,
+        lon,
+        units
+    );
 
     const weatherData = await requestJson(
         url,
         'Unable to load weather data.'
     );
 
-    if (!weatherData.current || !weatherData.daily) {
+    if (
+        !weatherData ||
+        !weatherData.current ||
+        !weatherData.daily
+    ) {
         throw new Error('Weather data is incomplete.');
     }
 
@@ -188,15 +223,20 @@ async function getWeatherByCoords(lat, lon, units = 'metric') {
 // Get Weather By City
 // ======================================================
 
-async function getWeatherByCity(cityName, units = 'metric') {
+async function getWeatherByCity(
+    cityName,
+    units = 'metric'
+) {
 
-    const city = await getCityCoordinates(cityName);
+    const city =
+        await getCityCoordinates(cityName);
 
-    const weather = await getWeatherByCoords(
-        city.latitude,
-        city.longitude,
-        units
-    );
+    const weather =
+        await getWeatherByCoords(
+            city.latitude,
+            city.longitude,
+            units
+        );
 
     return {
         city,
@@ -209,15 +249,20 @@ async function getWeatherByCity(cityName, units = 'metric') {
 // Get Forecast By City
 // ======================================================
 
-async function getForecast(cityName, units = 'metric') {
+async function getForecast(
+    cityName,
+    units = 'metric'
+) {
 
-    const city = await getCityCoordinates(cityName);
+    const city =
+        await getCityCoordinates(cityName);
 
-    const weather = await getWeatherByCoords(
-        city.latitude,
-        city.longitude,
-        units
-    );
+    const weather =
+        await getWeatherByCoords(
+            city.latitude,
+            city.longitude,
+            units
+        );
 
     return {
         city,
@@ -231,11 +276,15 @@ async function getForecast(cityName, units = 'metric') {
 // Get Weather By Current Location
 // ======================================================
 
-async function getWeatherByCurrentLocation(units = 'metric') {
+async function getWeatherByCurrentLocation(
+    units = 'metric'
+) {
 
     return new Promise((resolve, reject) => {
 
+        // Check browser support.
         if (!navigator.geolocation) {
+
             reject(
                 new Error(
                     'Geolocation is not supported by your browser.'
@@ -246,6 +295,7 @@ async function getWeatherByCurrentLocation(units = 'metric') {
         }
 
         navigator.geolocation.getCurrentPosition(
+
             async (position) => {
 
                 try {
@@ -269,6 +319,7 @@ async function getWeatherByCurrentLocation(units = 'metric') {
                     });
 
                 } catch (error) {
+
                     reject(error);
                 }
             },
@@ -277,31 +328,45 @@ async function getWeatherByCurrentLocation(units = 'metric') {
 
                 switch (error.code) {
 
+                    // Permission denied
                     case 1:
+
                         reject(
                             new Error(
                                 'Location permission was denied. Please search for a city manually.'
                             )
                         );
+
                         break;
 
+
+                    // Position unavailable
                     case 2:
+
                         reject(
                             new Error(
                                 'Your current location is unavailable.'
                             )
                         );
+
                         break;
 
+
+                    // Timeout
                     case 3:
+
                         reject(
                             new Error(
                                 'Location request timed out. Please try again.'
                             )
                         );
+
                         break;
 
+
+                    // Unknown error
                     default:
+
                         reject(
                             new Error(
                                 'Unable to get your current location.'
